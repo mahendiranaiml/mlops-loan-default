@@ -9,6 +9,7 @@ import logging
 from pathlib import Path
 from typing import Dict
 import pandas as pd
+import mlflow
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,8 +20,11 @@ logger = logging.getLogger(__name__)
 
 
 @pipeline
-def training_pipeline(strategy: str = "smote"):
-  
+def training_pipeline(strategy: str):
+    # Set MLflow tracking URI and experiment
+    mlflow.set_tracking_uri("./mlruns")
+    mlflow.set_experiment("loan-default-prediction")
+    
     logger.info(f"\n{'='*70}")
     logger.info(f"Starting Training Pipeline with strategy: {strategy}")
     logger.info(f"{'='*70}\n")
@@ -54,7 +58,7 @@ def training_pipeline(strategy: str = "smote"):
         model=model,
         X_test=X_test,
         y_test=y_test,
-        strategy_name=strategy
+        strategy=strategy
     )
     
     logger.info(f"\n{'='*70}")
@@ -64,45 +68,45 @@ def training_pipeline(strategy: str = "smote"):
     return model, metrics
 
 
-@pipeline
-def experimentation_pipeline(strategies: list = None):
+# @pipeline
+# def experimentation_pipeline(strategies: list = None):
 
-    if strategies is None:
-        strategies = [
-            'none',           # Baseline (no sampling)
-            'random_over',    # Random oversampling
-            'random_under',   # Random undersampling
-            'smote',          # Synthetic Minority Oversampling
-            'adasyn',         # Adaptive Synthetic Sampling
-            'smote_tomek',    # SMOTE + Tomek Links
-            'smote_enn'       # SMOTE + ENN
-        ]
+#     if strategies is None:
+#         strategies = [
+#             'none',           # Baseline (no sampling)
+#             'random_over',    # Random oversampling
+#             'random_under',   # Random undersampling
+#             'smote',          # Synthetic Minority Oversampling
+#             'adasyn',         # Adaptive Synthetic Sampling
+#             'smote_tomek',    # SMOTE + Tomek Links
+#             'smote_enn'       # SMOTE + ENN
+#         ]
     
-    logger.info(f"\n{'='*70}")
-    logger.info(f"🔬 EXPERIMENTATION PIPELINE - Testing {len(strategies)} strategies")
-    logger.info(f"{'='*70}\n")
+#     logger.info(f"\n{'='*70}")
+#     logger.info(f"🔬 EXPERIMENTATION PIPELINE - Testing {len(strategies)} strategies")
+#     logger.info(f"{'='*70}\n")
     
-    results = {}
+#     results = {}
     
-    for strategy in strategies:
-        logger.info(f"\n{'─'*70}")
-        logger.info(f"Testing strategy: {strategy.upper()}")
-        logger.info(f"{'─'*70}\n")
+#     for strategy in strategies:
+#         logger.info(f"\n{'─'*70}")
+#         logger.info(f"Testing strategy: {strategy.upper()}")
+#         logger.info(f"{'─'*70}\n")
         
-        model, metrics = training_pipeline(strategy=strategy)
-        results[strategy] = metrics
+#         model, metrics = training_pipeline(strategy=strategy)
+#         results[strategy] = metrics
     
-    # Compare results
-    logger.info(f"\n\n{'='*70}")
-    logger.info("📊 SUMMARY: COMPARING ALL STRATEGIES")
-    logger.info(f"{'='*70}\n")
+#     # Compare results
+#     logger.info(f"\n\n{'='*70}")
+#     logger.info("📊 SUMMARY: COMPARING ALL STRATEGIES")
+#     logger.info(f"{'='*70}\n")
     
-    comparison_df = pd.DataFrame(results).T
-    print(comparison_df[['accuracy', 'precision', 'recall', 'f1_score', 'false_negative_rate']])
+#     comparison_df = pd.DataFrame(results).T
+#     print(comparison_df[['accuracy', 'precision', 'recall', 'f1_score', 'false_negative_rate']])
     
-    logger.info(f"\n{'='*70}")
-    logger.info("✅ Experimentation completed!")
-    logger.info(f"{'='*70}\n")
+#     logger.info(f"\n{'='*70}")
+#     logger.info("✅ Experimentation completed!")
+#     logger.info(f"{'='*70}\n")
     
-    return results
+#     return results
     

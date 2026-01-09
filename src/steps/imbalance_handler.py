@@ -299,19 +299,13 @@ class ImbalanceHandlerFactory:
       
         return list(cls.STRATEGIES.keys())
     
-    from zenml import step
+from zenml import step
 from typing_extensions import Annotated
 import pandas as pd
 from .imbalance_handler import ImbalanceHandlerFactory
 import logging
 
 logger = logging.getLogger(__name__)
-
-from zenml import step
-
-
-from zenml import step
-from typing_extensions import Annotated
 
 @step
 def handle_imbalance(

@@ -3,6 +3,9 @@ import numpy as np
 from typing import Any
 from typing_extensions import Annotated
 from zenml import step
+import mlflow
+import joblib
+import mlflow.sklearn
 import logging
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.linear_model import LogisticRegression
@@ -44,12 +47,24 @@ def train_model(
         }
     
     # Create and train the model
+    mlflow.log_params(model_params)
     logger.info(f"   Model parameters: {model_params}")
     model = model_class(**model_params)
     
     logger.info("   Training in progress...")
+
     model.fit(X_train, y_train)
-    
+    # Log Model
+    mlflow.sklearn.log_model(model, "model")
+
+    # Save Model
+    local_path = "model.joblib"
+    joblib.dump(model, local_path)
+
+    # Add mlflow tag
+    mlflow.set_tag("model_type","RandomForest")
+    mlflow.set_tag("version","1.0")
+    mlflow.set_tag("author","Mahendiran")
     logger.info("Model training completed!")
     
     return model
