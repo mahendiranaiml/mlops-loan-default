@@ -5,8 +5,8 @@ from typing_extensions import Annotated
 from abc import ABC, abstractmethod
 from zenml import step
 import logging
-import mlflow
-import mlflow.sklearn
+# import mlflow
+# import mlflow.sklearn
 from sklearn.metrics import (
     classification_report,
     confusion_matrix,
@@ -16,6 +16,9 @@ from sklearn.metrics import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Optimal threshold found from threshold tuning
+OPTIMAL_THRESHOLD = 0.45
 
 class ModelEvaluator(ABC):
 
@@ -51,6 +54,9 @@ class LoanModelEvaluator(ModelEvaluator):
         
         try:
             y_pred_proba = model.predict_proba(X_test)[:, 1]
+            # Apply optimal threshold
+            y_pred = (y_pred_proba >= OPTIMAL_THRESHOLD).astype(int)
+            logger.info(f"   Using optimal threshold: {OPTIMAL_THRESHOLD}")
         except (AttributeError, IndexError):
             logger.warning("   ⚠️  Model does not support predict_proba()")
         
@@ -98,10 +104,10 @@ class LoanModelEvaluator(ModelEvaluator):
             'false_negatives': int(fn),  # 🎯 MINIMIZE THIS!
         }
 
-        # Log metrics (numeric only)
-        mlflow.log_metrics(metrics)
-        # Log strategy as a tag (strings can be tags)
-        mlflow.set_tag("strategy", strategy)
+        # # Log metrics (numeric only)
+        # mlflow.log_metrics(metrics)
+        # # Log strategy as a tag (strings can be tags)
+        # mlflow.set_tag("strategy", strategy)
         # Log detailed results
         logger.info("=" * 70)
         logger.info(f"📈 EVALUATION RESULTS - Strategy: {strategy}")

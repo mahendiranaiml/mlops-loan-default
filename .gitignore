@@ -76,3 +76,7 @@ htmlcov/
 
 mlflow.db
 mlruns/
+
+.dockerignore
+Dockerfile
+app/

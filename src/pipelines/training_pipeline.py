@@ -9,7 +9,7 @@ import logging
 from pathlib import Path
 from typing import Dict
 import pandas as pd
-import mlflow
+# import mlflow
 
 logging.basicConfig(
     level=logging.INFO,
@@ -22,8 +22,8 @@ logger = logging.getLogger(__name__)
 @pipeline
 def training_pipeline(strategy: str):
     # Set MLflow tracking URI and experiment
-    mlflow.set_tracking_uri("./mlruns")
-    mlflow.set_experiment("loan-default-prediction")
+    # mlflow.set_tracking_uri("./mlruns")
+    # mlflow.set_experiment("loan-default-prediction")
     
     logger.info(f"\n{'='*70}")
     logger.info(f"Starting Training Pipeline with strategy: {strategy}")
@@ -37,7 +37,7 @@ def training_pipeline(strategy: str):
     df_validated = validate_data(df)
 
     # 3. Preprocessing (split into train/test)
-    X_train, X_test, y_train, y_test = data_preprocess(df_validated)
+    X_train, X_test, y_train, y_test, = data_preprocess(df_validated)
 
     # 4. Handle Imbalance (apply sampling technique)
     X_train_balanced, y_train_balanced = handle_imbalance(

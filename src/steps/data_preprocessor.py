@@ -6,7 +6,7 @@ from typing_extensions import Annotated
 from sklearn.model_selection import train_test_split
 import logging
 from zenml import step
-from typing import Tuple
+from typing import Tuple, Any
 from abc import ABC, abstractmethod
 from sklearn.preprocessing import StandardScaler, OneHotEncoder, OrdinalEncoder
 from sklearn.compose import ColumnTransformer
@@ -193,7 +193,7 @@ def data_preprocess(df: pd.DataFrame) -> Tuple[
     Annotated[pd.DataFrame, "X_train"],
     Annotated[pd.DataFrame, "X_test"],
     Annotated[pd.Series, "y_train"],
-    Annotated[pd.Series, "y_test"]
+    Annotated[pd.Series, "y_test"],
 ]:
 
     logger.info("🚀 Starting data preprocessing step...")
@@ -205,7 +205,7 @@ def data_preprocess(df: pd.DataFrame) -> Tuple[
     X_train, X_test, y_train, y_test = dp.splitter(df)
 
     # Step 2: Build pipeline
-    dp.build_pipeline()
+    preprocessor = dp.build_pipeline()
 
     # Step 3: Apply transformations
     X_train_df, X_test_df = dp.fit_transform(X_train, X_test)

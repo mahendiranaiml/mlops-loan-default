@@ -3,12 +3,11 @@ import numpy as np
 from typing import Any
 from typing_extensions import Annotated
 from zenml import step
-import mlflow
-import joblib
-import mlflow.sklearn
+# from zenml.integrations.mlflow.experiment_trackers import mlflow_experiment_tracker
 import logging
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.linear_model import LogisticRegression
+from sklearn.utils.class_weight import compute_class_weight
 
 logger = logging.getLogger(__name__)
 
@@ -30,13 +29,12 @@ def train_model(
     
     # Use default model if not specified
     if model_class is None:
-        logger.info("   Using default: RandomForestClassifier")
+        logger.info("   Using default: GradientBoostingClassifier")
         model_class = RandomForestClassifier
         model_params = {
             'n_estimators': n_estimators,
             'max_depth': max_depth,
-            'random_state': random_state,
-            'class_weight': 'balanced'
+            'random_state': random_state
         }
     else:
         model_params = {
@@ -47,24 +45,36 @@ def train_model(
         }
     
     # Create and train the model
-    mlflow.log_params(model_params)
+    # tracker = mlflow_experiment_tracker()
+    # tracker.log_params(model_params)
     logger.info(f"   Model parameters: {model_params}")
     model = model_class(**model_params)
     
     logger.info("   Training in progress...")
 
-    model.fit(X_train, y_train)
-    # Log Model
-    mlflow.sklearn.log_model(model, "model")
+    # Calculate class weights to reduce False Negatives
+    class_weights = compute_class_weight(
+        'balanced',
+        classes=np.unique(y_train),
+        y=y_train
+    )
+    
+    # Create sample weights with higher weight for positive class (reduce FN) - trade-off
+    sample_weights = np.array([class_weights[int(y)] * 1.5 if y == 1 else class_weights[int(y)] for y in y_train])
+    
+    model.fit(X_train, y_train, sample_weight=sample_weights)
+    
+    # # Log the full model to MLflow
+    # tracker.sklearn.log_model(
+    #     model,
+    #     artifact_path="model",
+    #     registered_model_name="LoanDefaultModel"
+    # )
 
-    # Save Model
-    local_path = "model.joblib"
-    joblib.dump(model, local_path)
-
-    # Add mlflow tag
-    mlflow.set_tag("model_type","RandomForest")
-    mlflow.set_tag("version","1.0")
-    mlflow.set_tag("author","Mahendiran")
+    # # Add mlflow tag
+    # tracker.set_tag("model_type","GradientBoosting")
+    # tracker.set_tag("version","1.0")
+    # tracker.set_tag("author","Mahendiran")
     logger.info("Model training completed!")
     
     return model
