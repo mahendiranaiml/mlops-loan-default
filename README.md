@@ -13,7 +13,6 @@ This project demonstrates a complete ML workflow for predicting loan defaults, i
 * **Pipeline Orchestration:** ZenML
 * **Experiment Tracking:** MLflow (used but commented out in Docker due to compatibility issues)
 * **Containerization:** Docker
-* **CI/CD:** GitHub Actions
 * **Container Registry:** Docker Hub
 * **Dataset:** Kaggle Loan Default Dataset
 
@@ -48,7 +47,6 @@ mlops-loan-default/
 * **ZenML Pipeline:** Modular steps for preprocessing, training, and evaluation.
 * **Dockerized Workflow:** Fully containerized ML project for portability.
 * **Docker Hub Registry:** Images pushed to Docker Hub for reproducibility.
-* **CI/CD:** Automated Docker build and push using GitHub Actions.
 * **Experiment Tracking:** MLflow integration (commented in Docker due to compatibility issues).
 * **Reproducibility:** Any user can pull the Docker image and run the pipeline locally.
 
@@ -83,15 +81,6 @@ docker build -t mahendiranaiml/mlops-training:smote13 .
 docker run -it mahendiranaiml/mlops-training:smote13
 ```
 
-### CI/CD
-
-The project uses GitHub Actions to automate:
-
-1. Docker image build
-2. Push to Docker Hub
-
-Pipeline triggers automatically on **push to `main` branch**.
-
 ---
 
 ## 📊 Model
@@ -117,17 +106,6 @@ Pull the image:
 
 ```bash
 docker pull mahendiranaiml/mlops-training:smote13
-```
-
----
-
-## 📈 Future Improvements
-
-* Add FastAPI inference service
-* Add automated retraining pipeline
-* Cloud deployment and monitoring
-* MLflow integration fully functional in Docker
-
 ---
 
 ## 📝 References
@@ -135,6 +113,5 @@ docker pull mahendiranaiml/mlops-training:smote13
 * Kaggle Loan Default Dataset: [https://www.kaggle.com/datasets/nikhil1e9/loan-default](https://www.kaggle.com/)
 * ZenML Documentation: [https://docs.zenml.io/](https://docs.zenml.io/)
 * Docker Documentation: [https://docs.docker.com/](https://docs.docker.com/)
-* GitHub Actions: [https://docs.github.com/en/actions](https://docs.github.com/en/actions)
 
 ---
